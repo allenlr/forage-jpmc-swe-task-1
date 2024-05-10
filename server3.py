@@ -32,7 +32,10 @@ from random import normalvariate, random
 from socketserver import ThreadingMixIn
 
 import dateutil.parser
+import logging
 
+logging.basicConfig(level=logging.DEBUG, filename='server.log', filemode='w',
+                    format='%(name)s - %(levelname)s - %(message)s')
 ################################################################################
 #
 # Config
@@ -61,6 +64,7 @@ OVERLAP = 4
 def bwalk(min, max, std):
     """ Generates a bounded random walk. """
     rng = max - min
+    
     while True:
         max += normalvariate(0, std)
         yield abs((max % (rng * 2)) - rng) + min
@@ -216,7 +220,7 @@ def get(req_handler, routes):
                 return
 
 
-def run(routes, host='0.0.0.0', port=8080):
+def run(routes, host='0.0.0.0', port=8081):
     """ Runs a class as a server whose methods have been decorated with
         @route.
     """
@@ -232,7 +236,7 @@ def run(routes, host='0.0.0.0', port=8080):
     thread = threading.Thread(target=server.serve_forever)
     thread.daemon = True
     thread.start()
-    print('HTTP server started on port 8080')
+    print(f'HTTP server started on port {port}')
     while True:
         from time import sleep
         sleep(1)
